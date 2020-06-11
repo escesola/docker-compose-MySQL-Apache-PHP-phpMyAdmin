@@ -1,0 +1,195 @@
+﻿DROP DATABASE biblioteca;
+
+CREATE DATABASE biblioteca;
+
+USE biblioteca;
+
+CREATE TABLE libros (
+
+  id_libro   SMALLINT UNSIGNED AUTO_INCREMENT,
+  signatura  CHAR(10)     NOT NULL,
+  titulo     VARCHAR(40)  NOT NULL,
+  editorial  VARCHAR(20)  NOT NULL   DEFAULT    'RA-MA',
+  autor      VARCHAR(40),
+  disponible ENUM ('S', 'N'),
+
+  CONSTRAINT pk_libros     PRIMARY KEY (id_libro),
+  CONSTRAINT unq_signatura UNIQUE      (signatura)
+
+);
+
+CREATE TABLE socios (
+
+  nif        CHAR(9),
+  nombre     VARCHAR(15) NOT NULL,
+  apellidos  VARCHAR(30) NOT NULL,
+  direccion  VARCHAR(30) NOT NULL,
+  cp         CHAR(5)     NOT NULL,
+  fecha_alta DATE        NOT NULL,
+  fecha_baja DATE,
+
+  CONSTRAINT pk_socios PRIMARY KEY (nif)
+
+);
+
+CREATE TABLE prestamos (
+
+  id_prestamo    INT UNSIGNED AUTO_INCREMENT,
+  nif            CHAR(9) NOT NULL,
+  id_libro       SMALLINT UNSIGNED NOT NULL,
+  fecha_prestamo DATE     NOT NULL,
+  fecha_devol    DATE,
+
+  CONSTRAINT pk_prestamos PRIMARY KEY (id_prestamo),
+  CONSTRAINT fk_nif       FOREIGN KEY (nif)      REFERENCES socios (nif),
+  CONSTRAINT fk_id_libro  FOREIGN KEY (id_libro) REFERENCES libros (id_libro) 
+
+);
+
+CREATE TABLE empleados (
+
+  nif        CHAR(9),
+  nombre     VARCHAR(15) NOT NULL,
+  apellidos  VARCHAR(30) NOT NULL,
+  direccion  VARCHAR(30) NOT NULL,
+  cp         CHAR(5)     NOT NULL,
+  fecha_alta DATE        NOT NULL,
+  fecha_baja DATE,
+  salario    INT         NOT NULL,
+  ss         VARCHAR(20) NOT NULL,
+
+  CONSTRAINT pk_empleados PRIMARY KEY (nif)
+
+);
+
+
+INSERT INTO libros VALUES(
+  1, 'I PIL cap', 'El capitán calzoncillos', DEFAULT,'Pilkey, Dav', 'S');
+
+INSERT INTO libros VALUES(
+  2, 'I MAS mis', 'El misterio del perro secuestrado', DEFAULT,'Masters, M.', 'S');
+
+INSERT INTO libros VALUES(
+  3, 'I LI sec', 'El secreto de los piratas', DEFAULT,'Li', 'S');
+
+INSERT INTO libros VALUES(
+  4, 'I DIE mia', 'Mi amigo agapito', DEFAULT,'Díez Barrio, Germán', 'N');
+
+INSERT INTO libros VALUES(
+  5, 'I FAR unt', 'Un tiesto lleno de lápices', DEFAULT,'Farias, Juan', 'S');
+
+INSERT INTO libros VALUES(
+  6, 'T CHA sse', 'SQL Server 2000', DEFAULT,'Charte, Francisco', 'S');
+INSERT INTO libros VALUES(
+
+  7, 'T CHA php', 'Proyectos con PHP 5', DEFAULT, 'Charte, Francisco', 'N');
+
+INSERT INTO libros VALUES(
+  8, 'T CHA htm', 'La biblia de HTML', DEFAULT, 'Charte, Francisco', 'S');
+
+INSERT INTO libros VALUES(
+  9, 'G ESL uni', 'En busca del unicornio', DEFAULT, 'Eslava Galán, Juan', 'S');
+
+INSERT INTO libros VALUES(
+  10, 'G MUN ven', 'Ventanas de Nueva York', DEFAULT, 'Muñoz Molina, Antonio', 'N');
+
+INSERT INTO libros(id_libro,signatura,titulo,autor) 
+       VALUES(11, 'G BAL cli', 'Cuentos libertinos', 'Balzak, H.');
+
+INSERT INTO libros(id_libro,signatura,titulo,autor) 
+       VALUES(12, 'I PIL ca2', 'El capitán calzoncillos (2ª ed.)', 'Pilkey, Dav');
+
+INSERT INTO libros VALUES(
+  13, 'G MUN ve2', 'Ventanas de Nueva York - 2ª PARTE', DEFAULT, 'Muñoz Molina, Antonio', NULL);
+
+INSERT INTO socios VALUES(
+  '62877137F', 'Alejandro', 'Charte Luque', 'Las Flores, 12', '23021', '2002-04-18',NULL);
+
+INSERT INTO socios VALUES(
+  '23727319S', 'Belén', 'Arcos Trera', 'Betania, 7', '23001', '2003-02-8',NULL);
+
+INSERT INTO socios VALUES(
+  '43229482E', 'Antonio', 'Moreno Pardo', 'Juan Rincón, 2', '23008', '2003-10-28',NULL);
+
+INSERT INTO socios (nif, nombre, apellidos, direccion, cp, fecha_alta) 
+       VALUES('74381725T', 'Francisco', 'Lucas Pino', 'Las Flores, 12', '23021', '2005-06-09');
+
+INSERT INTO empleados VALUES(
+  '62877137F', 'Alejandro', 'Charte Luque', 'Las Flores, 12', '23021', '2002-04-18',NULL,17500,'280786574456');
+
+INSERT INTO empleados VALUES(
+  '54675432X', 'Sara', 'López Santos', 'Locura, 7', '23005', '2007-02-18',NULL,18000,'280354678900');
+
+INSERT INTO empleados VALUES(
+  '43229482E', 'Antonio', 'Moreno Pardo', 'Juan Rincón, 2', '23008', '2003-10-28',NULL,19800,'280975413212');
+
+INSERT INTO empleados (nif, nombre, apellidos, direccion, cp, fecha_alta,salario,ss) 
+       VALUES('04381525C', 'Elena', 'Fuerte Osar', 'Las Plantas, 15', '23022', '2005-06-09',21000,'280985675431');
+
+INSERT INTO prestamos VALUES(1, '62877137F', 4, (CURRENT_DATE - INTERVAL 20 DAY), NULL);
+
+INSERT INTO prestamos VALUES(2, '62877137F', 5, '2005-07-03', NULL);
+
+INSERT INTO prestamos VALUES(3, '23727319S', 7, (CURRENT_DATE - INTERVAL 35 DAY), NULL);
+
+INSERT INTO prestamos (id_prestamo, nif, id_libro, fecha_prestamo) 
+       VALUES(4, '74381725T', 10,(CURRENT_DATE - INTERVAL 22 DAY));
+
+INSERT INTO prestamos (id_prestamo, nif, id_libro, fecha_prestamo) 
+       VALUES(5, '74381725T', 6,(CURRENT_DATE - INTERVAL 37 DAY));
+
+INSERT INTO prestamos (id_prestamo, nif, id_libro, fecha_prestamo,fecha_devol) 
+       VALUES(6, '74381725T', 9,(CURRENT_DATE - INTERVAL 37 DAY),CURRENT_DATE);
+
+
+UPDATE libros
+SET disponible = 'S'
+WHERE disponible IS NULL AND id_libro<>13;
+
+UPDATE libros
+SET editorial = 'Mc Graw Hill'
+WHERE (id_libro=8 OR id_libro=10 OR id_libro=11);
+
+UPDATE socios
+SET fecha_baja=CURRENT_DATE
+WHERE nif='62877137F';
+
+UPDATE socios
+SET fecha_baja=NULL
+WHERE nif<>'62877137F';
+
+UPDATE prestamos
+SET fecha_devol=fecha_prestamo + INTERVAL 20 DAY
+WHERE fecha_prestamo='2005-07-03';
+
+UPDATE libros
+SET disponible='S'
+WHERE id_libro=7;
+
+UPDATE prestamos
+SET fecha_prestamo= CURRENT_DATE
+WHERE fecha_devol IS NULL AND id_libro=4;
+
+UPDATE prestamos
+SET fecha_prestamo= fecha_prestamo - INTERVAL 3 DAY
+WHERE NOT id_libro=4;
+
+UPDATE libros
+SET editorial = 'Paraninfo'
+WHERE id_libro>=2 AND id_libro<=6;
+
+UPDATE libros
+SET disponible='N'
+WHERE id_libro IS NOT NULL AND id_libro<>13;
+
+
+UPDATE prestamos
+SET fecha_devol=fecha_prestamo
+WHERE fecha_prestamo=CURRENT_DATE;
+
+UPDATE libros
+SET disponible = 'S'
+WHERE editorial = 'Paraninfo';
+
+
+
